@@ -39,9 +39,22 @@ halt:
 
 [BITS 32] ; Assemble the code for 32-bit protected mode
 start_protected_mode: ; First 32 bits instructions executed
-    mov al, 'A' ; Load character 'A' into al register
+    mov ecx, 0 ; Set ecx register to 0 (counter)
+    mov edi, 0xB8000 ; VGA text memory base address
+    mov ebx, msg ; Load the offset address of msg into ebx
+    call printmsg ; Set the next code segment to halt function
+
+printmsg:
+    mov al, [ebx] ; Save the current char into al register
     mov ah, 0x0f ; Text attribute: black background, bright white foreground
-    mov [0xb8000], ax ; Write 'A' and its attribute to VGA text memory with the ax register (al || ah)
-    jmp halt ; Set the next code segment to halt function
+    cmp al, 0 ; Check for end of string (null terminator)
+    jz halt ; If true | set the next code segment to halt function
+    mov [edi + ecx], ax ; Write the current character and its attribute to VGA text memory with the ax register (al || ah)
+    inc ebx ; Increment bx register for point to the next character
+    add ecx, 2 ; Move to next character cell in VGA text memory
+    jmp printmsg ; Loop to next character
+
+msg: db 'Hello World!', 0 ; Define "Hello World!\0" string
+
 times 510-($-$$) db 0 ; Fill the boot sector with zeros up to 510 bytes
 dw 0xAA55 ; BIOS signature
