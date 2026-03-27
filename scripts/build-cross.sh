@@ -1,11 +1,14 @@
 #!/bin/bash
 set -e
 
+apt update
+apt install nasm make qemu-system-i386 wget curl gcc xz-utils bzip2 -y
+
 TARGET=i686-elf
 PREFIX="$HOME/opt/cross"
 PATH="$PREFIX/bin:$PATH"
 
-BINUTILS_VERSION=2.46
+BINUTILS_VERSION=2.46.0
 GCC_VERSION=14.3.0
 
 mkdir -p "$HOME/cross/src" "$HOME/cross/build-binutils" "$HOME/cross/build-gcc" "$PREFIX"
@@ -35,7 +38,7 @@ cd "$HOME/cross/build-gcc"
   --target="$TARGET" \
   --prefix="$PREFIX" \
   --disable-nls \
-  --enable-languages=c,c++ \
+  --enable-languages=c \
   --without-headers
 make all-gcc -j"$(nproc)"
 make all-target-libgcc -j"$(nproc)"
@@ -43,4 +46,5 @@ make install-gcc
 make install-target-libgcc
 
 echo
-echo "Cross-compiler installed in $PREFIX"
+export PATH="$HOME/opt/cross/bin:$PATH"
+echo "Cross-compiler installed in $PREFIX and added in the PATH"
