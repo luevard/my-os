@@ -43,7 +43,7 @@ $(IMAGE): $(BOOT) $(KERNEL_BIN) | bin
 
 # Run in QEMU
 run: $(IMAGE)
-	qemu-system-i386 -drive format=raw,file=$(IMAGE)
+	qemu-system- -drive format=raw,file=$(IMAGE)
 
 # Debug mode
 debug: $(IMAGE)

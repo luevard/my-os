@@ -2,17 +2,17 @@
 set -e
 
 apt update
-apt install nasm make qemu-system-i386 wget curl gcc xz-utils bzip2 -y
+apt install nasm make qemu-system-i386 g++ wget curl gcc xz-utils bzip2 -y
 
 TARGET=i686-elf
-PREFIX="$HOME/opt/cross"
+PREFIX="$PWD/opt/cross"
 PATH="$PREFIX/bin:$PATH"
 
 BINUTILS_VERSION=2.46.0
 GCC_VERSION=14.3.0
 
-mkdir -p "$HOME/cross/src" "$HOME/cross/build-binutils" "$HOME/cross/build-gcc" "$PREFIX"
-cd "$HOME/cross/src"
+mkdir -p "$PWD/cross/src" "$PWD/cross/build-binutils" "$PWD/cross/build-gcc" "$PREFIX"
+cd "$PWD/cross/src"
 
 [ -f "binutils-$BINUTILS_VERSION.tar.xz" ] || wget "https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.xz"
 [ -f "gcc-$GCC_VERSION.tar.xz" ] || wget "https://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz"
@@ -20,11 +20,11 @@ cd "$HOME/cross/src"
 [ -d "binutils-$BINUTILS_VERSION" ] || tar -xf "binutils-$BINUTILS_VERSION.tar.xz"
 [ -d "gcc-$GCC_VERSION" ] || tar -xf "gcc-$GCC_VERSION.tar.xz"
 
-cd "$HOME/cross/src/gcc-$GCC_VERSION"
+cd "$PWD/cross/src/gcc-$GCC_VERSION"
 ./contrib/download_prerequisites
 
-cd "$HOME/cross/build-binutils"
-"$HOME/cross/src/binutils-$BINUTILS_VERSION/configure" \
+cd "$PWD/cross/build-binutils"
+"$PWD/cross/src/binutils-$BINUTILS_VERSION/configure" \
   --target="$TARGET" \
   --prefix="$PREFIX" \
   --with-sysroot \
@@ -33,8 +33,8 @@ cd "$HOME/cross/build-binutils"
 make -j"$(nproc)"
 make install
 
-cd "$HOME/cross/build-gcc"
-"$HOME/cross/src/gcc-$GCC_VERSION/configure" \
+cd "$PWD/cross/build-gcc"
+"$PWD/cross/src/gcc-$GCC_VERSION/configure" \
   --target="$TARGET" \
   --prefix="$PREFIX" \
   --disable-nls \
@@ -46,5 +46,5 @@ make install-gcc
 make install-target-libgcc
 
 echo
-export PATH="$HOME/opt/cross/bin:$PATH"
+export PATH="$PWD/opt/cross/bin:$PATH"
 echo "Cross-compiler installed in $PREFIX and added in the PATH"
