@@ -55,6 +55,5 @@ printmsg:
     jmp printmsg ; Loop to next character
 
 msg: db 'Hello World!', 0 ; Define "Hello World!\0" string
-
 times 510-($-$$) db 0 ; Fill the boot sector with zeros up to 510 bytes
 dw 0xAA55 ; BIOS signature

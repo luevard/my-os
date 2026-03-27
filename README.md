@@ -1,13 +1,21 @@
 # My-os
 
-## How to start the OS
+## Requirements
 
-`sudo apt install qemu-system-x86`
+- nasm
+- make
+- qemu-system-i386
+- i686-elf-gcc
+- i686-elf-binutils
 
-`git clone https://github.com/luevard/my-os.git`
+## Build
 
-`cd my-os`
+```bash
+## Build the cross-compiler
 
-`nasm boot.s -f bin -o boot.bin`
+chmod +x scripts/build-cross.sh
+./scripts/build-cross.sh
+export PATH="$HOME/opt/cross/bin:$PATH"
 
-`qemu-system-x86_64 -hda boot.bin`
+## 
+make run
