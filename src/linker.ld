@@ -1,8 +1,9 @@
 ENTRY(_main)
-
+OUTPUT_FORMAT("elf32-i386")
+OUTPUT_ARCH(i386)
 SECTIONS
 {
-    . = 1M;
+    . = 0x10000;
 
     .text :
     {

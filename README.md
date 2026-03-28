@@ -20,7 +20,6 @@
 cd my-os/
 chmod +x scripts/build-cross.sh
 ./scripts/build-cross.sh
-export PATH="$PWD/opt/cross/bin:$PATH"
 
 ## 
 make run

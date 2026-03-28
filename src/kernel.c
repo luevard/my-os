@@ -1,5 +1,6 @@
+#include "mystdio.h"
+
 int _main(){
-    while(1){
-        
-    }
+    printf("Hello World !");
+    return 0;
 }

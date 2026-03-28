@@ -1,8 +1,28 @@
 [BITS 16] ; Assemble the code for 16-bit real mode
 [ORG 0x7C00] ; Conventional Bootloader load address
+KERNEL_START_ADDR equ 0x10000
+KERNEL_LOAD_SEG equ 0x1000
+CODE_OFFSET equ 0x8
+DATA_OFFSET equ 0x10
+
 
 start:
     cli ; Disable interrupts
+
+    ; Charger le noyau à l'adresse physique 0x10000
+    xor ax, ax
+    mov ds, ax
+    mov ax, KERNEL_LOAD_SEG
+    mov es, ax    ; ES = 0x1000
+    xor bx, bx                 ; BX = 0x0000
+    mov dh, 0
+    mov dl, 0x80
+    mov cl, 0x02
+    mov ch, 0
+    mov ah, 0x02
+    mov al, 8
+    int 0x13
+
     lgdt [gdt_descriptor] ; Load the GDT descriptor
     mov eax, cr0 ; Save cr0 state (32 bits) into eax register
     or eax, 0x00000001 ; Change the PE bit (bit^0) to 1 to enable protected mode 
@@ -39,21 +59,18 @@ halt:
 
 [BITS 32] ; Assemble the code for 32-bit protected mode
 start_protected_mode: ; First 32 bits instructions executed
-    mov ecx, 0 ; Set ecx register to 0 (counter)
-    mov edi, 0xB8000 ; VGA text memory base address
-    mov ebx, msg ; Load the offset address of msg into ebx
-    call printmsg ; Set the next code segment to halt function
+    mov ax, DATA_OFFSET
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov ss, ax
+    mov gs, ax
+    mov ebp, 0x9C00
+    mov esp, ebp
+    in al, 0x92
+    or al, 2
+    out 0x92, al
+    jmp CODE_OFFSET:KERNEL_START_ADDR
 
-printmsg:
-    mov al, [ebx] ; Save the current char into al register
-    mov ah, 0x0f ; Text attribute: black background, bright white foreground
-    cmp al, 0 ; Check for end of string (null terminator)
-    jz halt ; If true | set the next code segment to halt function
-    mov [edi + ecx], ax ; Write the current character and its attribute to VGA text memory with the ax register (al || ah)
-    inc ebx ; Increment bx register for point to the next character
-    add ecx, 2 ; Move to next character cell in VGA text memory
-    jmp printmsg ; Loop to next character
-
-msg: db 'Hello World!', 0 ; Define "Hello World!\0" string
 times 510-($-$$) db 0 ; Fill the boot sector with zeros up to 510 bytes
 dw 0xAA55 ; BIOS signature
